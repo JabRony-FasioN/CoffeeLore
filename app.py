@@ -27,7 +27,10 @@ def register():
         password = request.form['password']
         email = request.form['email']
 
-        cursor.execute('SELECT * FROM users WHERE username = %s', (login,)) 
+        _hashed_password = generate_password_hash(password)
+
+
+        cursor.execute('SELECT * FROM users WHERE login = %s', (login,)) 
         account = cursor.fetchone()
         print(account)
 
@@ -40,7 +43,7 @@ def register():
         elif not login or not password or not email:
             flash("please fill out the forms!")
         else:
-            cursor.execute("INSERT INFO users (fullname, login, password, email) VALUES (%s,%s,%s,%s)", (fullname, login, _hashed_password, email))
+            cursor.execute("INSERT INTO users (fullname, login, password, email) VALUES (%s,%s,%s,%s)", (fullname, login, _hashed_password, email))
     elif request.method == "POST":
         flash('please fill out the form')
     return render_template('former.html')
