@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_mysqldb import MySQL
-import psycopg2
+import psycopg2, re
 import psycopg2.extras
 
 app = Flask(__name__)
@@ -12,21 +12,35 @@ DB_NAME = 'example_bd'
 DB_USER = 'postgres'
 DB_PASS = "password"
 
+conn = psycopg2.connect(dbname= DB_NAME, user = DB_USER, password=DB_PASS, host= DB_HOST)
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if request.method == 'POST':
         fullname = request.form['fullname']
         login = request.form['login']
         password = request.form['password']
         email = request.form['email']
-        print('fullname')
-        print('login')
-        print('password')
-        print('email')
+
+        cursor.execute('SELECT * FROM users WHERE username = %s', (login,)) 
+        account = cursor.fetchone()
+        print(account)
+
+        if account:
+            flash('Account alredy exists!')
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            flash('invalid email address!')
+        elif not re.match(r'[A-Za-z0-9]+', login):
+            flash('Login must contain only characters and numbers ')
+        elif not login or not password or not email:
+            flash("please fill out the forms!")
+
+
     return render_template('former.html')
 
 
