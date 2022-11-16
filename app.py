@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.secret_key= 'example_logister'
 
 
-DB_HOST = '127.0.0.1'
+DB_HOST = 'localhost'
 DB_NAME = 'example_bd'
 DB_USER = 'postgres'
 DB_PASS = "password"
